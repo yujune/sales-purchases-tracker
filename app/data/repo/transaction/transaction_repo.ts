@@ -1,4 +1,5 @@
 import {
+  NewTransaction,
   Transaction,
   transactions,
   TransactionType,
@@ -29,5 +30,14 @@ export class TransactionRepository {
       .from(transactions)
       .where(eq(transactions.type, type));
     return result[0].count;
+  }
+
+  async create(transaction: NewTransaction): Promise<Transaction> {
+    const [result] = await db
+      .insert(transactions)
+      .values(transaction)
+      .returning();
+
+    return result;
   }
 }
