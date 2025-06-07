@@ -7,10 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/ui/table";
+import HeaderNav from "../ui/headernav/headernav";
 
 export default function Loading() {
   return (
     <div>
+      <HeaderNav title="Sales" />
       <Table>
         <TableHeader>
           <TableRow>
