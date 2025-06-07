@@ -1,9 +1,11 @@
-import HeaderNav from "@/ui/headernav/headernav";
+import SalesPaginatedTable from "./ui/sales-paginated-table";
 
-export default function Sales() {
-  return (
-    <div>
-      <HeaderNav title="Sales" />
-    </div>
-  );
+export default async function Sales(props: {
+  searchParams?: Promise<{
+    page?: string;
+  }>;
+}) {
+  const params = await props.searchParams;
+
+  return <SalesPaginatedTable page={Number(params?.page) || 1} />;
 }
