@@ -1,6 +1,5 @@
 "use client";
 
-import { NewTransaction } from "@/app/data/database/entities";
 import { Button } from "@/app/ui/button";
 import ErrorDialog from "@/app/ui/dialog/error-dialog";
 import DateField from "@/app/ui/form/datefield";
@@ -9,10 +8,12 @@ import QuantityField from "@/app/ui/form/quantityfield";
 import UnitPriceField from "@/app/ui/form/unitpricefield";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
-import { createSale } from "../actions";
+import { createSale, NewSaleTransaction } from "../actions";
 
 const saleFormSchema = z.object({
   quantity: z.number().min(1),
@@ -25,6 +26,7 @@ type SaleFormModel = z.infer<typeof saleFormSchema>;
 export function AddSaleForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
   const form = useForm<SaleFormModel>({
     resolver: zodResolver(saleFormSchema),
     defaultValues: {
@@ -38,15 +40,14 @@ export function AddSaleForm() {
     try {
       setIsSubmitting(true);
       setError(null);
-      const transaction: NewTransaction = {
+      const transaction: NewSaleTransaction = {
         quantity: values.quantity,
         unitPrice: values.unitPrice,
-        type: "SALE",
-        wac: values.unitPrice,
-        totalInventoryQuantity: values.quantity,
-        createdAt: values.date,
+        date: values.date,
       };
       await createSale(transaction);
+      toast.success("Sale created successfully");
+      router.replace("/sales");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create sale");
     } finally {

@@ -1,6 +1,5 @@
 "use client";
 
-import { NewTransaction } from "@/app/data/database/entities";
 import { Button } from "@/app/ui/button";
 import ErrorDialog from "@/app/ui/dialog/error-dialog";
 import DateField from "@/app/ui/form/datefield";
@@ -9,10 +8,12 @@ import QuantityField from "@/app/ui/form/quantityfield";
 import UnitPriceField from "@/app/ui/form/unitpricefield";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
-import { createPurchase } from "../actions";
+import { createPurchase, NewPurchaseTransaction } from "../actions";
 
 const purchaseFormSchema = z.object({
   quantity: z.number().min(1),
@@ -25,6 +26,7 @@ type PurchaseFormModel = z.infer<typeof purchaseFormSchema>;
 export function AddPurchaseForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
   const form = useForm<PurchaseFormModel>({
     resolver: zodResolver(purchaseFormSchema),
     defaultValues: {
@@ -38,15 +40,14 @@ export function AddPurchaseForm() {
     try {
       setIsSubmitting(true);
       setError(null);
-      const transaction: NewTransaction = {
+      const transaction: NewPurchaseTransaction = {
         quantity: values.quantity,
         unitPrice: values.unitPrice,
-        type: "PURCHASE",
-        wac: values.unitPrice,
-        totalInventoryQuantity: values.quantity,
-        createdAt: values.date,
+        date: values.date,
       };
       await createPurchase(transaction);
+      toast.success("Purchase created successfully");
+      router.replace("/purchases");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to create purchase"
