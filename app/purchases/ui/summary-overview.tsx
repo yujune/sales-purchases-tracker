@@ -3,9 +3,7 @@ import { TransactionRepository } from "@/app/data/repo/transaction/transaction_r
 export const SummaryOverview = async () => {
   const transactionRepository = new TransactionRepository();
 
-  const latestPurchase = await transactionRepository.getLatestTransaction(
-    "PURCHASE"
-  );
+  const latestPurchase = await transactionRepository.getLatestTransaction();
 
   return !!latestPurchase ? (
     <div className="my-4">
@@ -21,11 +19,11 @@ export const SummaryOverview = async () => {
           title="Total Items Value (Cost)"
           value={`$${(
             latestPurchase.totalInventoryQuantity * latestPurchase.wac
-          ).toLocaleString()}`}
+          ).toFixed(2)}`}
         />
         <SummaryOverviewCard
           title="Weighted Average Cost"
-          value={`$${latestPurchase.wac.toLocaleString()}`}
+          value={`$${latestPurchase.wac.toFixed(2)}`}
         />
       </div>
     </div>
