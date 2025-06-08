@@ -21,9 +21,9 @@ export function PurchasesTable({ transactions }: PurchasesTableProps) {
           <TableHead>Quantity</TableHead>
           <TableHead>Unit Price</TableHead>
           <TableHead>WAC (Average Cost)</TableHead>
-          <TableHead>Date</TableHead>
           <TableHead>Total Amount</TableHead>
           <TableHead>Total Cost</TableHead>
+          <TableHead>Date</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -34,15 +34,15 @@ export function PurchasesTable({ transactions }: PurchasesTableProps) {
             <TableCell>${transaction.unitPrice.toFixed(2)}</TableCell>
             <TableCell>${transaction.wac.toFixed(2)}</TableCell>
             <TableCell>
-              {transaction.createdAt
-                ? new Date(transaction.createdAt).toLocaleDateString()
-                : "N/A"}
-            </TableCell>
-            <TableCell>
               ${(transaction.quantity * transaction.unitPrice).toFixed(2)}
             </TableCell>
             <TableCell>
               ${(transaction.quantity * transaction.wac).toFixed(2)}
+            </TableCell>
+            <TableCell>
+              {transaction.createdAt
+                ? new Date(transaction.createdAt).toLocaleDateString()
+                : "N/A"}
             </TableCell>
           </TableRow>
         ))}
