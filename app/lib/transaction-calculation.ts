@@ -64,6 +64,7 @@ function calculateNewTotalInventoryValue(
   lastPurchase: NewTransaction,
   currentTransaction: BaseNewTransaction
 ): number {
+  //Only for purchase transaction, the sale transaction will be blocked from calculateNewWac func.
   const totalInventoryValue =
     lastPurchase.totalInventoryQuantity * lastPurchase.wac;
 
