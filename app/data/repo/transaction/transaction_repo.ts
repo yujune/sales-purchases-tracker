@@ -5,7 +5,7 @@ import {
   TransactionType,
 } from "@/app/data/database/entities/transaction";
 import { db } from "@/database/db";
-import { and, asc, count, desc, eq, gte, lte, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, lt, or, sql } from "drizzle-orm";
 
 export class TransactionRepository {
   async findAll(params: {
@@ -13,8 +13,9 @@ export class TransactionRepository {
     limit?: number;
     type?: TransactionType;
     fromDate?: Date;
+    byDate?: Date;
   }): Promise<Transaction[]> {
-    const { page, limit, type, fromDate } = params;
+    const { page, limit, type, fromDate, byDate } = params;
 
     const query = db
       .select()
@@ -25,7 +26,10 @@ export class TransactionRepository {
       .where(
         and(
           !!type ? eq(transactions.type, type) : undefined,
-          !!fromDate ? gte(transactions.createdAt, fromDate) : undefined
+          or(
+            !!fromDate ? gt(transactions.createdAt, fromDate) : undefined,
+            !!byDate ? lt(transactions.createdAt, byDate) : undefined
+          )
         )
       );
 
@@ -38,6 +42,14 @@ export class TransactionRepository {
     }
 
     return await query;
+  }
+
+  async getTransactionById(id: string): Promise<Transaction | null> {
+    const result = await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.id, id));
+    return result.length > 0 ? result[0] : null;
   }
 
   async getTotalCount(type: TransactionType): Promise<number> {
@@ -66,7 +78,7 @@ export class TransactionRepository {
       .where(
         and(
           !!type ? eq(transactions.type, type) : undefined,
-          !!byDate ? lte(transactions.createdAt, byDate) : undefined
+          !!byDate ? lt(transactions.createdAt, byDate) : undefined
         )
       )
       .orderBy(desc(transactions.createdAt))
@@ -93,11 +105,38 @@ export class TransactionRepository {
       .onConflictDoUpdate({
         target: [transactions.id],
         set: {
-          wac: sql`excluded.wac`,
+          quantity: sql`excluded.quantity`,
+          unitPrice: sql`excluded."unitPrice"`,
+          createdAt: sql`excluded."createdAt"`,
+          wac: sql`excluded."wac"`,
           totalInventoryQuantity: sql`excluded."totalInventoryQuantity"`,
         },
       });
 
     return result;
+  }
+
+  async deleteAndUpdateTransactions(
+    transactionToDelete: Transaction,
+    newTransactions: NewTransaction[]
+  ): Promise<void> {
+    await db.transaction(async (tx) => {
+      await tx
+        .delete(transactions)
+        .where(eq(transactions.id, transactionToDelete.id));
+
+      if (newTransactions.length > 0) {
+        await tx
+          .insert(transactions)
+          .values(newTransactions)
+          .onConflictDoUpdate({
+            target: [transactions.id],
+            set: {
+              wac: sql`excluded.wac`,
+              totalInventoryQuantity: sql`excluded."totalInventoryQuantity"`,
+            },
+          });
+      }
+    });
   }
 }
