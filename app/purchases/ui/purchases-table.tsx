@@ -17,6 +17,7 @@ export function PurchasesTable({ transactions }: PurchasesTableProps) {
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead>ID</TableHead>
           <TableHead>Quantity</TableHead>
           <TableHead>Unit Price</TableHead>
           <TableHead>WAC (Average Cost)</TableHead>
@@ -26,6 +27,7 @@ export function PurchasesTable({ transactions }: PurchasesTableProps) {
       <TableBody>
         {transactions.map((transaction) => (
           <TableRow key={transaction.id}>
+            <TableCell>{transaction.id}</TableCell>
             <TableCell>{transaction.quantity}</TableCell>
             <TableCell>${transaction.unitPrice.toFixed(2)}</TableCell>
             <TableCell>${transaction.wac.toFixed(2)}</TableCell>
