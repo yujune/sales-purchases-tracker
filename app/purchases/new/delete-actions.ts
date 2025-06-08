@@ -21,10 +21,9 @@ async function getAffectedTransactionsAndRecalculate(params: {
   const newTransactions: Transaction[] = [];
 
   //Recalculate from the last purchase before the purchase to be deleted.
-  let lastTransaction = await transactionRepository.getLatestTransaction(
-    "PURCHASE",
-    affectingTransaction.createdAt!
-  );
+  let lastTransaction = await transactionRepository.getLatestTransaction({
+    byDate: affectingTransaction.createdAt!,
+  });
 
   for (const affectedTransaction of affectedTransactions) {
     const { wac, totalInventoryQuantity } =

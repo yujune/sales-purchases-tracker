@@ -47,10 +47,9 @@ async function getAffectedTransactionsAndRecalculate(params: {
 export async function updatePurchase(transaction: Transaction) {
   const transactionRepository = new TransactionRepository();
 
-  const lastTransaction = await transactionRepository.getLatestTransaction(
-    "PURCHASE",
-    transaction.createdAt!
-  );
+  const lastTransaction = await transactionRepository.getLatestTransaction({
+    byDate: transaction.createdAt!,
+  });
 
   //Construct new transaction with new wac and total inventory quantity.
   const { wac, totalInventoryQuantity } = calculateWacAndTotalInventoryQuantity(

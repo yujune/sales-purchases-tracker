@@ -15,7 +15,9 @@ export async function createSale(transaction: NewSaleTransaction) {
   await checkSameDateTransactionExists(transaction.date);
 
   const transactionRepository = new TransactionRepository();
-  const latestTransaction = await transactionRepository.getLatestTransaction();
+  const latestTransaction = await transactionRepository.getLatestTransaction({
+    type: "PURCHASE",
+  });
 
   if (!latestTransaction) {
     throw new Error("No inventory found, please add a purchase first");
@@ -39,6 +41,7 @@ export async function createSale(transaction: NewSaleTransaction) {
     type: "SALE",
     wac: toDecimal({ value: latestTransaction.wac, decimals: 2 }),
     totalInventoryQuantity: newTotalInventoryQuantity,
+    createdAt: transaction.date,
   };
 
   return await transactionRepository.create(newTransaction);

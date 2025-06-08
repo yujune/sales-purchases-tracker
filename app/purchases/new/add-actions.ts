@@ -5,32 +5,9 @@ import { TransactionRepository } from "@/app/data/repo/transaction/transaction_r
 import {
   BaseNewTransaction,
   calculateWacAndTotalInventoryQuantity,
+  constructNewTransaction,
 } from "@/app/lib/transaction-calculation";
 import { checkSameDateTransactionExists } from "@/app/lib/transaction-validation";
-import { toDecimal } from "@/app/lib/utils";
-
-//calculate new transaction wac and total inventory quantity based on the last transaction and the new transaction
-//and return the db model for new transaction.
-function constructNewTransaction(
-  lastTransaction: NewTransaction | null,
-  transaction: BaseNewTransaction
-): NewTransaction {
-  const { wac, totalInventoryQuantity } = calculateWacAndTotalInventoryQuantity(
-    lastTransaction,
-    transaction
-  );
-
-  const newTransaction: NewTransaction = {
-    quantity: transaction.quantity,
-    unitPrice: toDecimal({ value: transaction.unitPrice, decimals: 2 }),
-    type: "PURCHASE",
-    wac: toDecimal({ value: wac, decimals: 2 }),
-    totalInventoryQuantity: totalInventoryQuantity,
-    createdAt: transaction.date,
-  };
-
-  return newTransaction;
-}
 
 // Recalculate all transactions wac and total inventory quantity from a given date, and return the db model for new transactions.
 // param: affectingTransaction is the new transaction that affect all the wac and total inventory quantity after it.
@@ -80,10 +57,9 @@ async function recalculateAffectedTransactionsAndUpdateDb(
   const transactionRepository = new TransactionRepository();
 
   const previousPurchaseBeforeNewPurchase =
-    await transactionRepository.getLatestTransaction(
-      "PURCHASE",
-      transaction.date
-    );
+    await transactionRepository.getLatestTransaction({
+      byDate: transaction.date,
+    });
 
   const newTransaction = constructNewTransaction(
     previousPurchaseBeforeNewPurchase,
