@@ -1,4 +1,5 @@
 import { Transaction } from "@/app/data/database/entities/transaction";
+import { formatDate } from "@/app/lib/utils";
 import {
   Table,
   TableBody,
@@ -40,9 +41,9 @@ export function PurchasesTable({ transactions }: PurchasesTableProps) {
               ${(transaction.quantity * transaction.wac).toFixed(2)}
             </TableCell>
             <TableCell>
-              {transaction.createdAt
-                ? new Date(transaction.createdAt).toLocaleDateString()
-                : "N/A"}
+              {formatDate(
+                transaction.createdAt ? new Date(transaction.createdAt) : null
+              )}
             </TableCell>
           </TableRow>
         ))}
