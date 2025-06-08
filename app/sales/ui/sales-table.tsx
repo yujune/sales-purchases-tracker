@@ -22,7 +22,7 @@ export function PurchasesTable({ transactions }: PurchasesTableProps) {
           <TableHead>Quantity</TableHead>
           <TableHead>Unit Price</TableHead>
           <TableHead>WAC (Average Cost)</TableHead>
-          <TableHead>Total Amount</TableHead>
+          <TableHead>Total Sale Amount</TableHead>
           <TableHead>Total Cost</TableHead>
           <TableHead>Date</TableHead>
         </TableRow>
