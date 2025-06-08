@@ -1,4 +1,5 @@
 import { NewTransaction, TransactionType } from "../data/database/entities";
+import { toDecimal } from "./utils";
 
 //application model for new transaction, consists all the values getting from ui form.
 export interface BaseNewTransaction {
@@ -6,6 +7,29 @@ export interface BaseNewTransaction {
   unitPrice: number;
   date: Date;
   type: TransactionType;
+}
+
+//calculate new transaction wac and total inventory quantity based on the last transaction and the new transaction
+//and return the db model for new transaction.
+export function constructNewTransaction(
+  lastTransaction: NewTransaction | null,
+  transaction: BaseNewTransaction
+): NewTransaction {
+  const { wac, totalInventoryQuantity } = calculateWacAndTotalInventoryQuantity(
+    lastTransaction,
+    transaction
+  );
+
+  const newTransaction: NewTransaction = {
+    quantity: transaction.quantity,
+    unitPrice: toDecimal({ value: transaction.unitPrice, decimals: 2 }),
+    type: transaction.type,
+    wac: toDecimal({ value: wac, decimals: 2 }),
+    totalInventoryQuantity: totalInventoryQuantity,
+    createdAt: transaction.date,
+  };
+
+  return newTransaction;
 }
 
 // Calculate new WAC based on the previous purchase transaction and the current transaction
