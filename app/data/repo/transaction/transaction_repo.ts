@@ -68,10 +68,12 @@ export class TransactionRepository {
     return result.length > 0 ? result[0] : null;
   }
 
-  async getLatestTransaction(
-    type?: TransactionType,
-    byDate?: Date
-  ): Promise<Transaction | null> {
+  async getLatestTransaction(params?: {
+    type?: TransactionType;
+    byDate?: Date;
+  }): Promise<Transaction | null> {
+    const { type, byDate } = params ?? {};
+
     const result = await db
       .select()
       .from(transactions)
