@@ -139,6 +139,7 @@ async function recalculateAffectedTransactions(params: {
 }
 
 //recalculate all the affected transactions and update the db.
+//if no affected transactions, create a new transaction.
 async function recalculateAffectedTransactionsAndUpdateDb(
   transaction: BaseNewTransaction
 ) {
@@ -168,19 +169,5 @@ async function recalculateAffectedTransactionsAndUpdateDb(
 export async function createPurchase(transaction: BaseNewTransaction) {
   await checkSameDateTransactionExists(transaction.date);
 
-  const transactionRepository = new TransactionRepository();
-  const latestPurchase = await transactionRepository.getLatestTransaction(
-    "PURCHASE"
-  );
-
-  const isPurchaseAddedOnPastDate =
-    !!latestPurchase && transaction.date < latestPurchase.createdAt!;
-
-  if (isPurchaseAddedOnPastDate) {
-    await recalculateAffectedTransactionsAndUpdateDb(transaction);
-    return;
-  }
-
-  const newTransaction = constructNewTransaction(latestPurchase, transaction);
-  await transactionRepository.create(newTransaction);
+  await recalculateAffectedTransactionsAndUpdateDb(transaction);
 }
