@@ -12,7 +12,7 @@ export const SummaryOverview = async () => {
       </h1>
       <div className="flex space-x-4">
         <SummaryOverviewCard
-          title="Total Quantity"
+          title="Total Quantity Left"
           value={latestPurchase.totalInventoryQuantity.toString()}
         />
         <SummaryOverviewCard
