@@ -24,7 +24,7 @@ export default function UnitPriceField<T extends { unitPrice: number }>({
             <Input
               type="number"
               min={0}
-              step="1"
+              step="0.1"
               {...field}
               onChange={(e) => {
                 const value = e.target.value;
