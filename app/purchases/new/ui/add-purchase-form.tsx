@@ -1,5 +1,7 @@
 "use client";
 
+import { Transaction } from "@/app/data/database/entities";
+import { BaseNewTransaction } from "@/app/lib/transaction-calculation";
 import { Button } from "@/app/ui/button";
 import ErrorDialog from "@/app/ui/dialog/error-dialog";
 import DateField from "@/app/ui/form/datefield";
@@ -13,7 +15,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { BaseNewTransaction, createPurchase } from "../actions";
+import { updatePurchase } from "../../[id]/edit/update-actions";
+import { createPurchase } from "../add-actions";
 
 const purchaseFormSchema = z.object({
   quantity: z.number().min(1),
@@ -23,16 +26,20 @@ const purchaseFormSchema = z.object({
 
 type PurchaseFormModel = z.infer<typeof purchaseFormSchema>;
 
-export function AddPurchaseForm() {
+export function AddPurchaseForm({
+  transaction,
+}: {
+  transaction?: Transaction;
+}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const form = useForm<PurchaseFormModel>({
     resolver: zodResolver(purchaseFormSchema),
     defaultValues: {
-      quantity: 1,
-      unitPrice: 1,
-      date: new Date(),
+      quantity: transaction?.quantity ?? 1,
+      unitPrice: transaction?.unitPrice ?? 1,
+      date: transaction?.createdAt ?? new Date(),
     },
   });
 
@@ -40,14 +47,27 @@ export function AddPurchaseForm() {
     try {
       setIsSubmitting(true);
       setError(null);
-      const transaction: BaseNewTransaction = {
-        quantity: values.quantity,
-        unitPrice: values.unitPrice,
-        date: values.date,
-        type: "PURCHASE",
-      };
-      await createPurchase(transaction);
-      toast.success("Purchase created successfully");
+
+      if (transaction) {
+        const updatedTransaction: Transaction = {
+          ...transaction,
+          quantity: values.quantity,
+          unitPrice: values.unitPrice,
+          createdAt: values.date,
+          type: "PURCHASE",
+        };
+        await updatePurchase(updatedTransaction);
+        toast.success("Purchase updated successfully");
+      } else {
+        const transaction: BaseNewTransaction = {
+          quantity: values.quantity,
+          unitPrice: values.unitPrice,
+          date: values.date,
+          type: "PURCHASE",
+        };
+        await createPurchase(transaction);
+        toast.success("Purchase created successfully");
+      }
       router.replace("/purchases");
     } catch (err) {
       setError(
@@ -81,8 +101,10 @@ export function AddPurchaseForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Adding...
+                {transaction ? "Updating..." : "Adding..."}
               </>
+            ) : transaction ? (
+              "Update Purchase"
             ) : (
               "Add Purchase"
             )}
