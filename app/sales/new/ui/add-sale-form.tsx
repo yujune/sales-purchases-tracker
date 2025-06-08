@@ -15,8 +15,8 @@ import { z } from "zod";
 import { createSale } from "../actions";
 
 const saleFormSchema = z.object({
-  quantity: z.number().min(5),
-  unitPrice: z.number().min(190),
+  quantity: z.number().min(1),
+  unitPrice: z.number().min(0),
   date: z.date(),
 });
 
