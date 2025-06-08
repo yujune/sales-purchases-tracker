@@ -28,22 +28,32 @@ function calculateNewWac(
   );
 }
 
-export async function createPurchase(transaction: NewPurchaseTransaction) {
-  await checkSameDateTransactionExists(transaction.date);
-
+async function getWacAndTotalInventoryQuantity(
+  newTransaction: NewPurchaseTransaction
+): Promise<{ wac: number; totalInventoryQuantity: number }> {
   const transactionRepository = new TransactionRepository();
   const latestPurchase = await transactionRepository.getLatestTransaction(
     "PURCHASE"
   );
 
-  let wac = transaction.unitPrice;
-  let totalInventoryQuantity = transaction.quantity;
+  let wac = newTransaction.unitPrice;
+  let totalInventoryQuantity = newTransaction.quantity;
 
   if (!!latestPurchase) {
-    wac = calculateNewWac(latestPurchase, transaction);
+    wac = calculateNewWac(latestPurchase, newTransaction);
     totalInventoryQuantity =
-      latestPurchase.totalInventoryQuantity + transaction.quantity;
+      latestPurchase.totalInventoryQuantity + newTransaction.quantity;
   }
+
+  return { wac, totalInventoryQuantity };
+}
+
+export async function createPurchase(transaction: NewPurchaseTransaction) {
+  await checkSameDateTransactionExists(transaction.date);
+
+  const { wac, totalInventoryQuantity } = await getWacAndTotalInventoryQuantity(
+    transaction
+  );
 
   const newTransaction: NewTransaction = {
     quantity: transaction.quantity,
@@ -54,5 +64,6 @@ export async function createPurchase(transaction: NewPurchaseTransaction) {
     createdAt: transaction.date,
   };
 
+  const transactionRepository = new TransactionRepository();
   return await transactionRepository.create(newTransaction);
 }
