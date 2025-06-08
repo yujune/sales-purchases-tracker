@@ -19,7 +19,7 @@ export function PurchasesTable({ transactions }: PurchasesTableProps) {
         <TableRow>
           <TableHead>Quantity</TableHead>
           <TableHead>Unit Price</TableHead>
-          <TableHead>WAC</TableHead>
+          <TableHead>WAC (Average Cost)</TableHead>
           <TableHead>Date</TableHead>
         </TableRow>
       </TableHeader>
