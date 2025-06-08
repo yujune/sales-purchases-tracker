@@ -51,7 +51,7 @@ async function getAffectedTransactionsAndRecalculate(params: {
 
 //Recalculate all the affected transactions and update the db.
 //if no affected transactions, just create a new transaction.
-async function recalculateAffectedTransactionsAndUpdateDb(
+export async function recalculateAffectedTransactionsAndUpdateDb(
   transaction: BaseNewTransaction
 ) {
   const transactionRepository = new TransactionRepository();
