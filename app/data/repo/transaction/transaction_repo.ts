@@ -32,6 +32,27 @@ export class TransactionRepository {
     return result[0].count;
   }
 
+  async getTransactionByDate(date: Date): Promise<Transaction | null> {
+    const result = await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.createdAt, date));
+    return result.length > 0 ? result[0] : null;
+  }
+
+  async getLatestTransaction(
+    type?: TransactionType
+  ): Promise<Transaction | null> {
+    const result = await db
+      .select()
+      .from(transactions)
+      .where(!!type ? eq(transactions.type, type) : undefined)
+      .orderBy(desc(transactions.createdAt))
+      .limit(1);
+
+    return result.length > 0 ? result[0] : null;
+  }
+
   async create(transaction: NewTransaction): Promise<Transaction> {
     const [result] = await db
       .insert(transactions)
