@@ -1,3 +1,4 @@
+import Empty from "@/app/ui/empty";
 import { ITEMS_PER_PAGE } from "@/lib/constant";
 import { TransactionRepository } from "@/repo/transaction/transaction_repo";
 import PaginationMenu from "@/ui/pagination/pagination_menu";
@@ -23,7 +24,11 @@ export default async function PurchasesPaginatedTable({
 
   return (
     <>
-      <PurchasesTable transactions={purchases} />
+      {totalPages == 0 ? (
+        <Empty />
+      ) : (
+        <PurchasesTable transactions={purchases} />
+      )}
       <PaginationMenu page={page} totalPages={totalPages} href="/purchases" />
     </>
   );
