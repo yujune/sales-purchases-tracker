@@ -11,6 +11,7 @@ export interface NewPurchaseTransaction {
   date: Date;
 }
 
+// Calculate new WAC based on the previous purchase and the new purchase
 function calculateNewWac(
   latestPurchase: Transaction,
   newPurchase: NewPurchaseTransaction
@@ -28,14 +29,12 @@ function calculateNewWac(
   );
 }
 
-async function getWacAndTotalInventoryQuantity(
+// Calculate new WAC and total inventory quantity based on the previous purchase and the new purchase
+// If there is no previous purchase, the new WAC and total inventory quantity are the same as the new purchase
+async function calculateWacAndTotalInventoryQuantity(
+  latestPurchase: Transaction | null,
   newTransaction: NewPurchaseTransaction
 ): Promise<{ wac: number; totalInventoryQuantity: number }> {
-  const transactionRepository = new TransactionRepository();
-  const latestPurchase = await transactionRepository.getLatestTransaction(
-    "PURCHASE"
-  );
-
   let wac = newTransaction.unitPrice;
   let totalInventoryQuantity = newTransaction.quantity;
 
@@ -53,9 +52,13 @@ async function getWacAndTotalInventoryQuantity(
 export async function createPurchase(transaction: NewPurchaseTransaction) {
   await checkSameDateTransactionExists(transaction.date);
 
-  const { wac, totalInventoryQuantity } = await getWacAndTotalInventoryQuantity(
-    transaction
+  const transactionRepository = new TransactionRepository();
+  const latestPurchase = await transactionRepository.getLatestTransaction(
+    "PURCHASE"
   );
+
+  const { wac, totalInventoryQuantity } =
+    await calculateWacAndTotalInventoryQuantity(latestPurchase, transaction);
 
   const newTransaction: NewTransaction = {
     quantity: transaction.quantity,
@@ -66,6 +69,5 @@ export async function createPurchase(transaction: NewPurchaseTransaction) {
     createdAt: transaction.date,
   };
 
-  const transactionRepository = new TransactionRepository();
   return await transactionRepository.create(newTransaction);
 }
