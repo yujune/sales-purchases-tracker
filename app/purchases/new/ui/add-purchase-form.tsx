@@ -13,7 +13,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { createPurchase, NewPurchaseTransaction } from "../actions";
+import { BaseNewTransaction, createPurchase } from "../actions";
 
 const purchaseFormSchema = z.object({
   quantity: z.number().min(1),
@@ -40,10 +40,11 @@ export function AddPurchaseForm() {
     try {
       setIsSubmitting(true);
       setError(null);
-      const transaction: NewPurchaseTransaction = {
+      const transaction: BaseNewTransaction = {
         quantity: values.quantity,
         unitPrice: values.unitPrice,
         date: values.date,
+        type: "PURCHASE",
       };
       await createPurchase(transaction);
       toast.success("Purchase created successfully");
