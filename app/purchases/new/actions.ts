@@ -39,7 +39,9 @@ async function getWacAndTotalInventoryQuantity(
   let wac = newTransaction.unitPrice;
   let totalInventoryQuantity = newTransaction.quantity;
 
-  if (!!latestPurchase) {
+  const hasPreviousPurchase = !!latestPurchase;
+
+  if (hasPreviousPurchase) {
     wac = calculateNewWac(latestPurchase, newTransaction);
     totalInventoryQuantity =
       latestPurchase.totalInventoryQuantity + newTransaction.quantity;
