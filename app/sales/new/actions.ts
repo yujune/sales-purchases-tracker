@@ -1,23 +1,15 @@
 "use server";
 
-import { NewTransaction } from "@/app/data/database/entities";
 import { TransactionRepository } from "@/app/data/repo/transaction/transaction_repo";
+import { BaseNewTransaction } from "@/app/lib/transaction-calculation";
 import { checkSameDateTransactionExists } from "@/app/lib/transaction-validation";
-import { toDecimal } from "@/app/lib/utils";
+import { recalculateAffectedTransactionsAndUpdateDb } from "@/app/purchases/new/add-actions";
 
-export interface NewSaleTransaction {
-  quantity: number;
-  unitPrice: number;
-  date: Date;
-}
-
-export async function createSale(transaction: NewSaleTransaction) {
+export async function createSale(transaction: BaseNewTransaction) {
   await checkSameDateTransactionExists(transaction.date);
 
   const transactionRepository = new TransactionRepository();
-  const latestTransaction = await transactionRepository.getLatestTransaction({
-    type: "PURCHASE",
-  });
+  const latestTransaction = await transactionRepository.getLatestTransaction();
 
   if (!latestTransaction) {
     throw new Error("No inventory found, please add a purchase first");
@@ -33,16 +25,5 @@ export async function createSale(transaction: NewSaleTransaction) {
     );
   }
 
-  const newTotalInventoryQuantity = latestTotalInventoryQuantity - saleQuantity;
-
-  const newTransaction: NewTransaction = {
-    quantity: saleQuantity,
-    unitPrice: toDecimal({ value: transaction.unitPrice, decimals: 2 }),
-    type: "SALE",
-    wac: toDecimal({ value: latestTransaction.wac, decimals: 2 }),
-    totalInventoryQuantity: newTotalInventoryQuantity,
-    createdAt: transaction.date,
-  };
-
-  return await transactionRepository.create(newTransaction);
+  await recalculateAffectedTransactionsAndUpdateDb(transaction);
 }

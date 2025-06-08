@@ -1,5 +1,6 @@
 "use client";
 
+import { BaseNewTransaction } from "@/app/lib/transaction-calculation";
 import { Button } from "@/app/ui/button";
 import ErrorDialog from "@/app/ui/dialog/error-dialog";
 import DateField from "@/app/ui/form/datefield";
@@ -13,7 +14,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { createSale, NewSaleTransaction } from "../actions";
+import { createSale } from "../actions";
 
 const saleFormSchema = z.object({
   quantity: z.number().min(1),
@@ -40,10 +41,11 @@ export function AddSaleForm() {
     try {
       setIsSubmitting(true);
       setError(null);
-      const transaction: NewSaleTransaction = {
+      const transaction: BaseNewTransaction = {
         quantity: values.quantity,
         unitPrice: values.unitPrice,
         date: values.date,
+        type: "SALE",
       };
       await createSale(transaction);
       toast.success("Sale created successfully");
