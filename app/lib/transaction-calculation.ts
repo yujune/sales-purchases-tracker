@@ -1,5 +1,4 @@
 import { NewTransaction, TransactionType } from "../data/database/entities";
-import { toDecimal } from "./utils";
 
 //application model for new transaction, consists all the values getting from ui form.
 export interface BaseNewTransaction {
@@ -22,9 +21,9 @@ export function constructNewTransaction(
 
   const newTransaction: NewTransaction = {
     quantity: transaction.quantity,
-    unitPrice: toDecimal({ value: transaction.unitPrice, decimals: 2 }),
+    unitPrice: transaction.unitPrice,
     type: transaction.type,
-    wac: toDecimal({ value: wac, decimals: 2 }),
+    wac: wac,
     totalInventoryQuantity: totalInventoryQuantity,
     createdAt: transaction.date,
   };
