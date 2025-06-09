@@ -2,6 +2,8 @@
 
 A Next.js application for tracking sales and purchases transactions. The system is capable of calculating the cost for each of the sales records based on Weighted Average Cost (WAC).
 
+Demo: https://youtu.be/7zheV2tu8Nw
+
 ## Supported features
 
 - Record new purchase transaction.
