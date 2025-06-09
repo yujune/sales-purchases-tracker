@@ -1,4 +1,4 @@
-import { TransactionRepository } from "../data/repo/transaction/transaction_repo";
+import { TransactionRepository } from "@/data/repo/transaction/transaction_repo";
 
 export const checkSameDateTransactionExists = async (transactionDate: Date) => {
   const transactionRepository = new TransactionRepository();
