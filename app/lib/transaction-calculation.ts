@@ -1,10 +1,12 @@
 import { NewTransaction, TransactionType } from "../data/database/entities";
+import { TransactionRepository } from "../data/repo/transaction/transaction_repo";
 
 //application model for new transaction, consists all the values getting from ui form.
 export interface BaseNewTransaction {
+  id?: string;
   quantity: number;
   unitPrice: number;
-  date: Date;
+  createdAt: Date;
   type: TransactionType;
 }
 
@@ -20,12 +22,10 @@ export function constructNewTransaction(
   );
 
   const newTransaction: NewTransaction = {
-    quantity: transaction.quantity,
-    unitPrice: transaction.unitPrice,
-    type: transaction.type,
+    ...transaction,
     wac: wac,
     totalInventoryQuantity: totalInventoryQuantity,
-    createdAt: transaction.date,
+    createdAt: transaction.createdAt,
   };
 
   return newTransaction;
@@ -108,4 +108,71 @@ export function calculateWacAndTotalInventoryQuantity(
   }
 
   return { wac, totalInventoryQuantity };
+}
+
+// Recalculate all transactions wac and total inventory quantity from a given date, and return the db model for new transactions.
+// param: affectingTransaction is the new transaction that affect all the wac and total inventory quantity after it.
+export async function getAffectedTransactionsAndRecalculate(params: {
+  affectingTransaction: NewTransaction;
+}): Promise<NewTransaction[]> {
+  const { affectingTransaction } = params;
+
+  const transactionRepository = new TransactionRepository();
+
+  const affectedTransactions = await transactionRepository.findAll({
+    fromDate: affectingTransaction.createdAt!,
+  });
+
+  let previousTransaction = affectingTransaction;
+
+  const newTransactions: NewTransaction[] = [];
+
+  for (const affectedTransaction of affectedTransactions) {
+    const { wac, totalInventoryQuantity } =
+      calculateWacAndTotalInventoryQuantity(previousTransaction, {
+        quantity: affectedTransaction.quantity,
+        unitPrice: affectedTransaction.unitPrice,
+        createdAt: affectedTransaction.createdAt!,
+        type: affectedTransaction.type,
+      });
+
+    const newAffectedTransaction = {
+      ...affectedTransaction,
+      wac,
+      totalInventoryQuantity,
+    };
+
+    newTransactions.push(newAffectedTransaction);
+
+    previousTransaction = newAffectedTransaction;
+  }
+
+  return newTransactions;
+}
+
+//Update current transaction and recalculate all the affected transactions, then update the db.
+//if no affected transactions, just create or update the transaction.
+export async function upsertCurrentAndRecalculateAffectedTransactions(
+  transaction: BaseNewTransaction
+) {
+  const transactionRepository = new TransactionRepository();
+
+  const previousPurchaseBeforeNewPurchase =
+    await transactionRepository.getLatestTransaction({
+      byDate: transaction.createdAt!,
+    });
+
+  const newTransaction = constructNewTransaction(
+    previousPurchaseBeforeNewPurchase,
+    transaction
+  );
+
+  const newAffectedTransactions = await getAffectedTransactionsAndRecalculate({
+    affectingTransaction: newTransaction,
+  });
+
+  await transactionRepository.updateExistingTransactions([
+    newTransaction,
+    ...newAffectedTransactions,
+  ]);
 }

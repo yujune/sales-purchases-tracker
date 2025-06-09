@@ -1,7 +1,7 @@
+import { getAffectedTransactionsAndRecalculate } from "@/app/lib/transaction-calculation";
 import { Transaction } from "@/data/database/entities";
 import { TransactionRepository } from "@/data/repo/transaction/transaction_repo";
 import { jest } from "@jest/globals";
-import { getAffectedTransactionsAndRecalculate } from "../add-actions";
 
 jest.mock("@/data/repo/transaction/transaction_repo");
 jest.mock("@/app/lib/transaction-validation", () => ({

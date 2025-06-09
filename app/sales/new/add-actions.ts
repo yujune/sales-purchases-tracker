@@ -1,12 +1,14 @@
 "use server";
 
 import { TransactionRepository } from "@/app/data/repo/transaction/transaction_repo";
-import { BaseNewTransaction } from "@/app/lib/transaction-calculation";
+import {
+  BaseNewTransaction,
+  upsertCurrentAndRecalculateAffectedTransactions,
+} from "@/app/lib/transaction-calculation";
 import { checkSameDateTransactionExists } from "@/app/lib/transaction-validation";
-import { recalculateAffectedTransactionsAndUpdateDb } from "@/app/purchases/new/add-actions";
 
 export async function createSale(transaction: BaseNewTransaction) {
-  await checkSameDateTransactionExists(transaction.date);
+  await checkSameDateTransactionExists(transaction.createdAt);
 
   const transactionRepository = new TransactionRepository();
   const latestTransaction = await transactionRepository.getLatestTransaction();
@@ -25,5 +27,5 @@ export async function createSale(transaction: BaseNewTransaction) {
     );
   }
 
-  await recalculateAffectedTransactionsAndUpdateDb(transaction);
+  await upsertCurrentAndRecalculateAffectedTransactions(transaction);
 }
