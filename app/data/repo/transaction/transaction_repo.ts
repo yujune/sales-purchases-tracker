@@ -1,10 +1,10 @@
+import { db } from "@/data/database/db";
 import {
   NewTransaction,
   Transaction,
   transactions,
   TransactionType,
-} from "@/app/data/database/entities/transaction";
-import { db } from "@/database/db";
+} from "@/data/database/entities/transaction";
 import { and, asc, count, desc, eq, gt, lt, or, sql } from "drizzle-orm";
 
 export class TransactionRepository {
