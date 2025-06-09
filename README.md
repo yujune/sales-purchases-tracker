@@ -1,36 +1,215 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sales & Purchases Tracker
+
+A Next.js application for tracking sales and purchases transactions. The system is capable of calculating the cost for each of the sales records based on Weighted Average Cost (WAC).
+
+## Supported features
+
+- Record new purchase transaction.
+- Retrieve a list of purchase transactions.
+- Record new sales transaction.
+- Retrieve a list of sales transactions.
+- Allowing creation of transactions in random date order and system to
+  automatically adjust costing for affected transactions accordingly.
+- Allowing updating / deleting existing transactions.
+
+## Methodology
+
+The system uses Weighted Average Cost (WAC) methodology to calculate the cost of inventory. Here's how different transaction scenarios are handled:
+
+### New Purchase Transaction
+
+1. When a new purchase is added:
+   - If it's the first purchase, WAC equals the unit price
+   - If there are existing purchases:
+     - New WAC = (Total Inventory Value + Current Transaction Value) / (Total Inventory Quantity + Current Transaction Quantity)
+     - Total Inventory Value = Previous Total Inventory Quantity × Previous WAC
+     - Total Inventory Quantity = Previous Total Inventory Quantity + Current Transaction Quantity
+
+### New Sale Transaction
+
+1. When a new sale is added:
+   - WAC remains the same as the previous transaction, sale won't affect wac.
+   - Total Inventory Quantity = Previous Total Inventory Quantity - Current Transaction Quantity
+
+### Transaction Updates/Deletions
+
+1. When a transaction is updated or deleted:
+   - System identifies all affected transactions (transactions after the modified date)
+   - Recalculates WAC and Total Inventory Quantity for all affected transactions in chronological order
+   - Each subsequent transaction uses the previous transaction's values for calculations
+
+### Random Date Order Transactions
+
+1. When adding a transaction with a date between existing transactions:
+   - System finds the latest transaction before the new transaction's date
+   - Calculates WAC and Total Inventory Quantity for the new transaction
+   - Recalculates all subsequent transactions to maintain accurate inventory values
+
+This methodology ensures accurate inventory valuation and cost tracking regardless of the order in which transactions are recorded or modified.
+
+## Data Model
+
+### Transaction Model
+
+The system uses the following database schema for transactions:
+
+```typescript
+const transactions = pgTable("Transactions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  quantity: integer("quantity").notNull(),
+  unitPrice: doublePrecision("unitPrice").notNull(),
+  type: text({ enum: ["PURCHASE", "SALE"] }).notNull(),
+  wac: doublePrecision("wac").notNull(),
+  totalInventoryQuantity: integer("totalInventoryQuantity").notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+```
+
+Key fields explained:
+
+- `id`: UUID primary key, automatically generated
+- `quantity`: Integer representing the number of items in the transaction
+- `unitPrice`: Double precision number for the price per item
+- `type`: Transaction type, either "PURCHASE" or "SALE"
+- `wac`: Double precision number for the Weighted Average Cost
+- `totalInventoryQuantity`: Integer representing the total inventory after the transaction
+- `createdAt`: Timestamp of when the transaction was created, defaults to current time
+
+## Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+- Supabase account (for database hosting)
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yujune/sales-purchases-tracker.git
+cd sales-purchases-tracker
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Set up environment variables:
+   Create a `.env.local` file in the root directory with the following variables:
+
+```env
+DATABASE_URL=your_supabase_url
+```
+
+More info on getting supbase url: https://supabase.com/docs/guides/database/connecting-to-postgres#shared-pooler, make update the [YOUR-PASSWORD] in the supabase url to your supabase password.
+
+4. Run database migrations:
+
+```bash
+npm run db:generate #Generate migrations
+npm run db:migrate #Migrate generated migrations
+```
+
+5. Start the development server:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Testing
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Run the test suite:
 
-## Learn More
+```bash
+npm test
+# or
+yarn test
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Using the System
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Adding a New Purhcase Transaction
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Click "Purchases" on the side bar
+2. Click the "New" button on the navigation bar.
+3. Fill in the transaction details:
+   - Quantity (Number of item purchased)
+   - Unit Price (Price per item purchased)
+   - Purchase Date (Date of the item purchased)
+4. Click "Add Purchase" to create a purchase transaction
 
-## Deploy on Vercel
+### Updating a Purchase Transaction
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Find the transaction in the list
+2. Click the edit (pencil) icon
+3. Modify the required fields
+4. Click "Update Purchase" to update the transaction
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Deleting a Transaction
+
+1. Find the transaction in the list
+2. Click the delete (trash) icon
+
+The same is applied to Sale transaction.
+
+## Development
+
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build the application for production
+- `npm run start` - Start the production server
+- `npm run lint` - Run ESLint to check code quality
+- `npm run db:generate` - Generate database migrations
+- `npm run db:migrate` - Apply database migrations
+
+## Tech Stack
+
+- Next.js 15
+- React 19
+- TypeScript
+- Drizzle ORM
+- PostgreSQL
+- Supabase
+- Tailwind CSS
+- ShadCn
+- Jest for testing
+
+## Project Structure
+
+```
+app/
+├── data/                  # Data layer
+│   ├── database/         # Database schema definition (in drizzle)
+│   └── repo/            # Repository layer for database operations
+├── lib/                  # Core utilities and business logic
+│   ├── actions/         # Resuable server actions for data mutations
+│   ├── __tests__/       # Test files for utilities
+│   ├── transaction-calculation.ts  # Business logic for transactions
+│   ├── transaction-validation.ts   # Transaction validation
+│   └── utils.ts         # Helper functions
+├─- purchases/           # Purchase transaction pages
+├── sales/              # Sales transaction pages
+├── ui/                 # Reusable UI components
+├── globals.css         # Global styles
+├── layout.tsx          # Root layout component
+└── page.tsx            # Home page component
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License.
