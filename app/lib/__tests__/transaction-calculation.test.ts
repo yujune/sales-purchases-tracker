@@ -15,7 +15,7 @@ describe("Transaction Calculation", () => {
       const baseTransaction = {
         quantity: 150,
         unitPrice: 2,
-        date: mockDate,
+        createdAt: mockDate,
         type: "PURCHASE" as TransactionType,
       };
 
@@ -44,7 +44,7 @@ describe("Transaction Calculation", () => {
       const baseTransaction = {
         quantity: 10,
         unitPrice: 1.5,
-        date: mockDate,
+        createdAt: mockDate,
         type: "PURCHASE" as TransactionType,
       };
 
@@ -75,7 +75,7 @@ describe("Transaction Calculation", () => {
       const saleTransaction = {
         quantity: 5,
         unitPrice: 10,
-        date: mockDate,
+        createdAt: mockDate,
         type: "SALE" as TransactionType,
       };
 
@@ -96,7 +96,7 @@ describe("Transaction Calculation", () => {
       const newPurchase = {
         quantity: 10,
         unitPrice: 1.5,
-        date: mockDate,
+        createdAt: mockDate,
         type: "PURCHASE" as TransactionType,
       };
 
@@ -119,7 +119,7 @@ describe("Transaction Calculation", () => {
       const newPurchase = {
         quantity: 10,
         unitPrice: 1.5,
-        date: mockDate,
+        createdAt: mockDate,
         type: "PURCHASE" as TransactionType,
       };
 
@@ -143,7 +143,7 @@ describe("Transaction Calculation", () => {
       const saleTransaction = {
         quantity: 5,
         unitPrice: 10,
-        date: mockDate,
+        createdAt: mockDate,
         type: "SALE" as TransactionType,
       };
 
@@ -160,7 +160,7 @@ describe("Transaction Calculation", () => {
       const baseTransaction = {
         quantity: 150,
         unitPrice: 2,
-        date: mockDate,
+        createdAt: mockDate,
         type: "PURCHASE" as TransactionType,
       };
 
@@ -188,7 +188,7 @@ describe("Transaction Calculation", () => {
       const baseTransaction = {
         quantity: 10,
         unitPrice: 1.5,
-        date: mockDate,
+        createdAt: mockDate,
         type: "PURCHASE" as TransactionType,
       };
 

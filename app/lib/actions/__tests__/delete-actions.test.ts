@@ -104,7 +104,7 @@ describe("delete-actions", () => {
         {
           quantity: mockAffectedTransactions[0].quantity,
           unitPrice: mockAffectedTransactions[0].unitPrice,
-          date: mockAffectedTransactions[0].createdAt,
+          createdAt: mockAffectedTransactions[0].createdAt,
           type: mockAffectedTransactions[0].type,
         }
       );

@@ -21,7 +21,7 @@ import { createPurchase } from "../add-actions";
 const purchaseFormSchema = z.object({
   quantity: z.number().min(1),
   unitPrice: z.number().min(0),
-  date: z.date(),
+  createdAt: z.date(),
 });
 
 type PurchaseFormModel = z.infer<typeof purchaseFormSchema>;
@@ -39,7 +39,7 @@ export function AddPurchaseForm({
     defaultValues: {
       quantity: transaction?.quantity ?? 1,
       unitPrice: transaction?.unitPrice ?? 1,
-      date: transaction?.createdAt ?? new Date(),
+      createdAt: transaction?.createdAt ?? new Date(),
     },
   });
 
@@ -53,7 +53,7 @@ export function AddPurchaseForm({
           ...transaction,
           quantity: values.quantity,
           unitPrice: values.unitPrice,
-          createdAt: values.date,
+          createdAt: values.createdAt,
           type: "PURCHASE",
         };
         await updateTransaction(updatedTransaction);
@@ -62,7 +62,7 @@ export function AddPurchaseForm({
         const transaction: BaseNewTransaction = {
           quantity: values.quantity,
           unitPrice: values.unitPrice,
-          date: values.date,
+          createdAt: values.createdAt,
           type: "PURCHASE",
         };
         await createPurchase(transaction);

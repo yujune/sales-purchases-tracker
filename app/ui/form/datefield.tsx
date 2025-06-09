@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from "./form";
 
-export default function DateField<T extends { date: Date }>({
+export default function DateField<T extends { createdAt: Date }>({
   control,
   description,
 }: {
@@ -19,7 +19,7 @@ export default function DateField<T extends { date: Date }>({
   return (
     <FormField
       control={control}
-      name={"date" as Path<T>}
+      name={"createdAt" as Path<T>}
       render={({ field }) => (
         <FormItem className="flex flex-col">
           <FormLabel>Purchase Date</FormLabel>

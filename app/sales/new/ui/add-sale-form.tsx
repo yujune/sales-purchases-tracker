@@ -21,7 +21,7 @@ import { createSale } from "../add-actions";
 const saleFormSchema = z.object({
   quantity: z.number().min(1),
   unitPrice: z.number().min(0),
-  date: z.date(),
+  createdAt: z.date(),
 });
 
 type SaleFormModel = z.infer<typeof saleFormSchema>;
@@ -35,7 +35,7 @@ export function AddSaleForm({ transaction }: { transaction?: Transaction }) {
     defaultValues: {
       quantity: transaction?.quantity ?? 1,
       unitPrice: transaction?.unitPrice ?? 1,
-      date: transaction?.createdAt ?? new Date(),
+      createdAt: transaction?.createdAt ?? new Date(),
     },
   });
 
@@ -49,7 +49,7 @@ export function AddSaleForm({ transaction }: { transaction?: Transaction }) {
           ...transaction,
           quantity: values.quantity,
           unitPrice: values.unitPrice,
-          createdAt: values.date,
+          createdAt: values.createdAt,
           type: "SALE",
         };
         await updateTransaction(updatedTransaction);
@@ -58,7 +58,7 @@ export function AddSaleForm({ transaction }: { transaction?: Transaction }) {
         const transaction: BaseNewTransaction = {
           quantity: values.quantity,
           unitPrice: values.unitPrice,
-          date: values.date,
+          createdAt: values.createdAt,
           type: "SALE",
         };
         await createSale(transaction);

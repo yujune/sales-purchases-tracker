@@ -30,7 +30,7 @@ export async function getAffectedTransactionsAndRecalculate(params: {
       calculateWacAndTotalInventoryQuantity(lastTransaction, {
         quantity: affectedTransaction.quantity,
         unitPrice: affectedTransaction.unitPrice,
-        date: affectedTransaction.createdAt!,
+        createdAt: affectedTransaction.createdAt!,
         type: affectedTransaction.type,
       });
 
