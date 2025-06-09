@@ -1,8 +1,8 @@
 "use client";
 
 import { Transaction } from "@/app/data/database/entities/transaction";
+import { updateTransaction } from "@/app/lib/actions/update-actions";
 import { BaseNewTransaction } from "@/app/lib/transaction-calculation";
-import { updateTransaction } from "@/app/purchases/[id]/edit/update-actions";
 import { Button } from "@/app/ui/button";
 import ErrorDialog from "@/app/ui/dialog/error-dialog";
 import DateField from "@/app/ui/form/datefield";
@@ -16,7 +16,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { createSale } from "../actions";
+import { createSale } from "../add-actions";
 
 const saleFormSchema = z.object({
   quantity: z.number().min(1),

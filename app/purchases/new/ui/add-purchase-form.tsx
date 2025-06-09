@@ -15,7 +15,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { updateTransaction } from "../../[id]/edit/update-actions";
+import { updateTransaction } from "../../../lib/actions/update-actions";
 import { createPurchase } from "../add-actions";
 
 const purchaseFormSchema = z.object({

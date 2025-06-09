@@ -15,7 +15,7 @@ import { PencilIcon, Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
-import { deleteTransaction } from "../new/delete-actions";
+import { deleteTransaction } from "../../lib/actions/delete-actions";
 
 interface PurchasesTableProps {
   transactions: Transaction[];

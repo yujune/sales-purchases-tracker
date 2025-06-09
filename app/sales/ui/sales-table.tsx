@@ -1,8 +1,8 @@
 "use client";
 
 import { Transaction } from "@/app/data/database/entities/transaction";
+import { deleteTransaction } from "@/app/lib/actions/delete-actions";
 import { formatDate } from "@/app/lib/utils";
-import { deleteTransaction } from "@/app/purchases/new/delete-actions";
 import { Button } from "@/app/ui/button";
 import {
   Table,
