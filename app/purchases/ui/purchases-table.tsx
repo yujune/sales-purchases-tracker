@@ -15,7 +15,7 @@ import { PencilIcon, Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
-import { deletePurchase } from "../new/delete-actions";
+import { deleteTransaction } from "../new/delete-actions";
 
 interface PurchasesTableProps {
   transactions: Transaction[];
@@ -28,7 +28,7 @@ export function PurchasesTable({ transactions }: PurchasesTableProps) {
   const handleDelete = (transaction: Transaction) => {
     startTransition(async () => {
       try {
-        await deletePurchase(transaction);
+        await deleteTransaction(transaction);
         toast.success("Purchase deleted successfully");
         router.refresh();
       } catch (err: unknown) {

@@ -48,7 +48,7 @@ async function getAffectedTransactionsAndRecalculate(params: {
   return newTransactions;
 }
 
-export async function deletePurchase(transaction: Transaction) {
+export async function deleteTransaction(transaction: Transaction) {
   const newAffectedTransactions = await getAffectedTransactionsAndRecalculate({
     affectingTransaction: transaction,
   });

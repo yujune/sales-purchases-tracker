@@ -1,6 +1,8 @@
 "use client";
 
+import { Transaction } from "@/app/data/database/entities/transaction";
 import { BaseNewTransaction } from "@/app/lib/transaction-calculation";
+import { updateTransaction } from "@/app/purchases/[id]/edit/update-actions";
 import { Button } from "@/app/ui/button";
 import ErrorDialog from "@/app/ui/dialog/error-dialog";
 import DateField from "@/app/ui/form/datefield";
@@ -24,16 +26,16 @@ const saleFormSchema = z.object({
 
 type SaleFormModel = z.infer<typeof saleFormSchema>;
 
-export function AddSaleForm() {
+export function AddSaleForm({ transaction }: { transaction?: Transaction }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const form = useForm<SaleFormModel>({
     resolver: zodResolver(saleFormSchema),
     defaultValues: {
-      quantity: 1,
-      unitPrice: 1,
-      date: new Date(),
+      quantity: transaction?.quantity ?? 1,
+      unitPrice: transaction?.unitPrice ?? 1,
+      date: transaction?.createdAt ?? new Date(),
     },
   });
 
@@ -41,14 +43,27 @@ export function AddSaleForm() {
     try {
       setIsSubmitting(true);
       setError(null);
-      const transaction: BaseNewTransaction = {
-        quantity: values.quantity,
-        unitPrice: values.unitPrice,
-        date: values.date,
-        type: "SALE",
-      };
-      await createSale(transaction);
-      toast.success("Sale created successfully");
+
+      if (transaction) {
+        const updatedTransaction: Transaction = {
+          ...transaction,
+          quantity: values.quantity,
+          unitPrice: values.unitPrice,
+          createdAt: values.date,
+          type: "SALE",
+        };
+        await updateTransaction(updatedTransaction);
+        toast.success("Sale updated successfully");
+      } else {
+        const transaction: BaseNewTransaction = {
+          quantity: values.quantity,
+          unitPrice: values.unitPrice,
+          date: values.date,
+          type: "SALE",
+        };
+        await createSale(transaction);
+        toast.success("Sale created successfully");
+      }
       router.replace("/sales");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create sale");
@@ -80,8 +95,10 @@ export function AddSaleForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Adding...
+                {transaction ? "Updating..." : "Adding..."}
               </>
+            ) : transaction ? (
+              "Update Sale"
             ) : (
               "Add Sale"
             )}

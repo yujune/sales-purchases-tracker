@@ -15,7 +15,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { updatePurchase } from "../../[id]/edit/update-actions";
+import { updateTransaction } from "../../[id]/edit/update-actions";
 import { createPurchase } from "../add-actions";
 
 const purchaseFormSchema = z.object({
@@ -56,7 +56,7 @@ export function AddPurchaseForm({
           createdAt: values.date,
           type: "PURCHASE",
         };
-        await updatePurchase(updatedTransaction);
+        await updateTransaction(updatedTransaction);
         toast.success("Purchase updated successfully");
       } else {
         const transaction: BaseNewTransaction = {

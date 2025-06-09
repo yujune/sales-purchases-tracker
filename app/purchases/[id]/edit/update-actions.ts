@@ -44,7 +44,7 @@ async function getAffectedTransactionsAndRecalculate(params: {
   return newTransactions;
 }
 
-export async function updatePurchase(transaction: Transaction) {
+export async function updateTransaction(transaction: Transaction) {
   const transactionRepository = new TransactionRepository();
 
   const lastTransaction = await transactionRepository.getLatestTransaction({

@@ -2,7 +2,7 @@ import Empty from "@/app/ui/empty";
 import { ITEMS_PER_PAGE } from "@/lib/constant";
 import { TransactionRepository } from "@/repo/transaction/transaction_repo";
 import PaginationMenu from "@/ui/pagination/pagination_menu";
-import { PurchasesTable } from "./sales-table";
+import { SalesTable } from "./sales-table";
 
 export default async function SalesPaginatedTable({ page }: { page: number }) {
   const transactionRepository = new TransactionRepository();
@@ -20,7 +20,7 @@ export default async function SalesPaginatedTable({ page }: { page: number }) {
 
   return (
     <>
-      {totalPages == 0 ? <Empty /> : <PurchasesTable transactions={sales} />}
+      {totalPages == 0 ? <Empty /> : <SalesTable transactions={sales} />}
       <PaginationMenu page={page} totalPages={totalPages} href="/sales" />
     </>
   );
