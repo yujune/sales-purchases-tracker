@@ -1,17 +1,17 @@
 "use server";
 
-import { NewTransaction } from "@/app/data/database/entities";
-import { TransactionRepository } from "@/app/data/repo/transaction/transaction_repo";
 import {
   BaseNewTransaction,
   calculateWacAndTotalInventoryQuantity,
   constructNewTransaction,
 } from "@/app/lib/transaction-calculation";
 import { checkSameDateTransactionExists } from "@/app/lib/transaction-validation";
+import { NewTransaction } from "@/data/database/entities";
+import { TransactionRepository } from "@/data/repo/transaction/transaction_repo";
 
 // Recalculate all transactions wac and total inventory quantity from a given date, and return the db model for new transactions.
 // param: affectingTransaction is the new transaction that affect all the wac and total inventory quantity after it.
-async function getAffectedTransactionsAndRecalculate(params: {
+export async function getAffectedTransactionsAndRecalculate(params: {
   affectingTransaction: NewTransaction;
 }): Promise<NewTransaction[]> {
   const { affectingTransaction } = params;
